@@ -1,15 +1,19 @@
 population = for _ <- 1..100, do: for(_ <- 1..1000, do: Enum.random(0..1))
 
+# Sort chromosomes by performance
 fitness = fn population ->
   Enum.sort_by(population, &Enum.sum/1, &>=/2)
 end
 
+# Take pairs of best chromosomes
 selection = fn population ->
   population
   |> Enum.chunk_every(2)
   |> Enum.map(&List.to_tuple(&1))
 end
 
+# For each chromosome pair, cut both chromosomes in half at random point
+# And then swap the tail parts
 crossover = fn population ->
   Enum.reduce(population, [], fn {p1, p2}, acc ->
     cx_point = :rand.uniform(1000)
@@ -18,6 +22,7 @@ crossover = fn population ->
   end)
 end
 
+# Each chromosome has a 5% chance to shuffle all genes
 mutation = fn population ->
   population
   |> Enum.map(fn chromosome ->
