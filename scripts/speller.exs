@@ -20,7 +20,9 @@ defmodule Speller do
   end
 
   @impl true
-  def terminate?([best | _]), do: best.fitness == 1
+  def terminate?([best | _], generation, temperature) do
+    temperature < 1
+  end
 end
 
 soln = Genetic.run(Speller)
