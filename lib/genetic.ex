@@ -15,7 +15,7 @@ defmodule Genetic do
       age = chromosome.age + 1
       %Chromosome{chromosome | fitness: fitness, age: age}
     end)
-    |> Enum.sort_by(fitness_function, &>=/2)
+    |> Enum.sort_by(fn chromosome -> chromosome.fitness end, &>=/2)
   end
 
   def select(population, opts \\ []) do
@@ -49,7 +49,7 @@ defmodule Genetic do
   end
 
   def run(problem, opts \\ []) do
-    population = initialize(&problem.genotype/0)
+    population = initialize(&problem.genotype/0, opts)
     population
     |> evolve(problem, 0, 0, 50, opts)
   end
