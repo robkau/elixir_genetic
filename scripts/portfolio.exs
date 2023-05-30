@@ -11,7 +11,6 @@ defmodule Portfolio do
     %Chromosome{genes: genes, size: 10}
   end
 
-
   @impl true
   def fitness_function(chromosome) do
     # most roi with lowest risk
@@ -21,8 +20,8 @@ defmodule Portfolio do
   end
 
   @impl true
-  def terminate?([best |_], generation, temperature) do
-      best.fitness > @target_fitness
+  def terminate?([best | _], generation, temperature) do
+    best.fitness > @target_fitness
   end
 end
 
