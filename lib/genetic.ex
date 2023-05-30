@@ -43,16 +43,32 @@ defmodule Genetic do
   end
 
   def crossover(population, opts \\ []) do
+    crossover_fn = Keyword.get(opts, :crossover_type, &Toolbox.Crossover.single_point/2)
+
     population
     |> Enum.reduce(
       [],
       fn {p1, p2}, acc ->
-        cut_point = :rand.uniform(length(p1.genes))
-        {{h1, t1}, {h2, t2}} = {Enum.split(p1.genes, cut_point), Enum.split(p2.genes, cut_point)}
-        {c1, c2} = {%Chromosome{p1 | genes: h1 ++ t2}, %Chromosome{p2 | genes: h2 ++ t1}}
+        {c1, c2} = apply(crossover_fn, [p1, p2])
         [c1, c2 | acc]
       end
     )
+    |> Enum.map(& repair_chromosome(&1))
+  end
+
+  # todo specific length 8 is for nqueens problem only
+  def repair_chromosome(chromosome) do
+    genes = MapSet.new(chromosome.genes)
+    new_genes = repair_helper(genes, 8)
+    %Chromosome{chromosome | genes: new_genes}
+  end
+  defp repair_helper(chromosome, k) do
+    if MapSet.size(chromosome) >= k do
+      MapSet.to_list(chromosome)
+    else
+      num = :rand.uniform(8)
+      repair_helper(MapSet.put(chromosome, num), k)
+    end
   end
 
   def mutation(population, opts \\ []) do

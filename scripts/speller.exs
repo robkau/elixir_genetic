@@ -22,11 +22,11 @@ defmodule Speller do
   @impl true
   def terminate?([best | _], generation, temperature) do
     #temperature < 1
-    best.fitness == String.length(@target_word)
+    best.fitness == 1
   end
 end
 
-soln = Genetic.run(Speller, selection_strategy: &Toolbox.Selection.roulette/2)
+soln = Genetic.run(Speller, selection_type: &Toolbox.Selection.elite/2, crossover_type: &Toolbox.Crossover.single_point/2)
 
 IO.write("\n")
 IO.inspect(soln)
