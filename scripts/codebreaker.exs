@@ -18,7 +18,7 @@ defmodule Codebreaker do
 
     key =
       chromosome.genes
-      |> Enum.map(& Integer.to_string(&1))
+      |> Enum.map(&Integer.to_string(&1))
       |> Enum.join("")
       |> String.to_integer(2)
 
@@ -42,10 +42,9 @@ IO.inspect(soln)
 
 {key, ""} =
   soln.genes
-    |> Enum.map(& Integer.to_string(&1))
-    |> Enum.join("")
-    |> Integer.parse(2)
-
+  |> Enum.map(&Integer.to_string(&1))
+  |> Enum.join("")
+  |> Integer.parse(2)
 
 IO.write("\n The key is #{key}\n")
 use Bitwise
