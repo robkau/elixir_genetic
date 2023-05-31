@@ -14,41 +14,42 @@ defmodule Toolbox.Crossover do
   def single_point_multi_parents([]) do
     raise "You must use at least one parent"
   end
+
   def single_point_multi_parents([p1 | []]), do: p1
+
   def single_point_multi_parents(parents) do
     crossover_point = :rand.uniform(hd(parents).size)
+
     parents
-      |> Enum.chunk_every(2, 1, [hd(parents)])
-      |> Enum.map(&(List.to_tuple(&1)))
-      |> Enum.reduce(
-        [],
-        fn {p1, p2}, chd ->
-          {front, _} = Enum.split(p1.genes, crossover_point)
-          {_, back} = Enum.split(p2.genes, crossover_point)
-          c = front ++ back
-          p = %Chromosome{p1 | genes: c, size: length(c)}
-          [p | chd]
-        end
-       )
+    |> Enum.chunk_every(2, 1, [hd(parents)])
+    |> Enum.map(&List.to_tuple(&1))
+    |> Enum.reduce(
+      [],
+      fn {p1, p2}, chd ->
+        {front, _} = Enum.split(p1.genes, crossover_point)
+        {_, back} = Enum.split(p2.genes, crossover_point)
+        c = front ++ back
+        p = %Chromosome{p1 | genes: c, size: length(c)}
+        [p | chd]
+      end
+    )
   end
-
-
 
   # Randomly swaps matching pairs of genes between parents
   # May be good strategy for binary genotypes
   # May be slow for large chromosomes
   def uniform(p1, p2, rate) do
     {c1, c2} =
-    p1.genes
-    |> Enum.zip(p2.genes)
-    |> Enum.map(fn {x, y} ->
-      if :rand.uniform() < rate do
-        {x, y}
-      else
-        {y, x}
-      end
-    end)
-    |> Enum.unzip()
+      p1.genes
+      |> Enum.zip(p2.genes)
+      |> Enum.map(fn {x, y} ->
+        if :rand.uniform() < rate do
+          {x, y}
+        else
+          {y, x}
+        end
+      end)
+      |> Enum.unzip()
 
     {%Chromosome{p1 | genes: c1, size: length(c1)}, %Chromosome{p2 | genes: c2, size: length(c2)}}
   end
@@ -92,14 +93,12 @@ defmodule Toolbox.Crossover do
     {c1, c2} =
       p1.genes
       |> Enum.zip(p2.genes)
-      |> Enum.map(
-        fn {x, y} ->
-          {
-            x * alpha + y*(1-alpha),
-            x*(1-alpha) + y*alpha,
-          }
-        end
-         )
+      |> Enum.map(fn {x, y} ->
+        {
+          x * alpha + y * (1 - alpha),
+          x * (1 - alpha) + y * alpha
+        }
+      end)
       |> Enum.unzip()
 
     {%Chromosome{p1 | genes: c1, size: length(c1)}, %Chromosome{p2 | genes: c2, size: length(c2)}}

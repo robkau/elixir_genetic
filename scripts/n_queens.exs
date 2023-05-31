@@ -14,12 +14,14 @@ defmodule NQueens do
       for i <- 0..7, j <- 0..7 do
         if i != j do
           dx = abs(i - j)
+
           dy =
             abs(
               chromosome.genes
               |> Enum.at(i)
               |> Kernel.-(Enum.at(chromosome.genes, j))
             )
+
           if dx == dy do
             1
           else
@@ -29,6 +31,7 @@ defmodule NQueens do
           0
         end
       end
+
     length(Enum.uniq(chromosome.genes)) - Enum.sum(diag_clashes)
   end
 
@@ -38,7 +41,11 @@ defmodule NQueens do
   end
 end
 
-soln = Genetic.run(NQueens, selection_type: &Toolbox.Selection.tournament(&1, &2, 4), crossover_type: &Toolbox.Crossover.uniform(&1, &2, 0.5))
+soln =
+  Genetic.run(NQueens,
+    selection_type: &Toolbox.Selection.tournament(&1, &2, 4),
+    crossover_type: &Toolbox.Crossover.order_one/2
+  )
 
 IO.write("\n\nSolution found:\n")
 IO.inspect(soln)

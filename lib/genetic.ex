@@ -19,7 +19,7 @@ defmodule Genetic do
   end
 
   def select(population, opts \\ []) do
-    select_fn = Keyword.get(opts, :selection_type, &Toolbox.Selection.tournament/2)
+    select_fn = Keyword.get(opts, :selection_type, &Toolbox.Selection.elite/2)
     select_rate = Keyword.get(opts, :selection_rate, 0.8)
 
     n = round(length(population) * select_rate)
@@ -53,7 +53,7 @@ defmodule Genetic do
         [c1, c2 | acc]
       end
     )
-    |> Enum.map(& repair_chromosome(&1))
+    #|> Enum.map(& repair_chromosome(&1))
   end
 
   # todo specific length 8 is for nqueens problem only

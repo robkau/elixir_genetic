@@ -17,7 +17,6 @@ defmodule Toolbox.Selection do
   # Each tournament consists of random participants
   # Each tournament, select the most fit participant
   # Balances fitness and genetic diversity
-  # Todo: how to handle 3 arg inside genetic.ex
   def tournament(population, n, tournsize) do
     0..(n - 1)
     |> Enum.map(fn _ ->
