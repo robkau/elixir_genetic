@@ -1,7 +1,7 @@
 defmodule Types.Chromosome do
   @type t :: %__MODULE__{
           genes: Enum.t(),
-          size: integer(),  # todo if size not used by end of book then delete it...
+          size: integer(),
           fitness: number(),
           age: integer()
         }

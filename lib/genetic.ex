@@ -53,7 +53,8 @@ defmodule Genetic do
         [c1, c2 | acc]
       end
     )
-    #|> Enum.map(& repair_chromosome(&1))
+
+    # |> Enum.map(& repair_chromosome(&1))
   end
 
   # todo specific length 8 is for nqueens problem only
@@ -62,6 +63,7 @@ defmodule Genetic do
     new_genes = repair_helper(genes, 8)
     %Chromosome{chromosome | genes: new_genes}
   end
+
   defp repair_helper(chromosome, k) do
     if MapSet.size(chromosome) >= k do
       MapSet.to_list(chromosome)
