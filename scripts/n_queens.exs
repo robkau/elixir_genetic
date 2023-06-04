@@ -47,5 +47,4 @@ soln =
     crossover_type: &Toolbox.Crossover.order_one/2
   )
 
-IO.write("\n\nSolution found:\n")
 IO.inspect(soln)
