@@ -41,13 +41,13 @@ defmodule Schedule do
 
   @impl true
   def terminate?(_population, generation, temperature) do
-    generation > 1000
+    generation >= 1000
   end
 end
 
 soln = Genetic.run(
   Schedule,
-  crossover_type: &Toolbox.Crossover.uniform(&1, &2, 0.5),
+  crossover_type: &Toolbox.Crossover.single_point/2,
   reinsertion_strategy: &Toolbox.Reinsertion.elitist(&1, &2, &3, 0.1),
   selection_rate: 0.8,
   mutation_rate: 0.1)

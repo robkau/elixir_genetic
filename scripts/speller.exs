@@ -20,13 +20,19 @@ defmodule Speller do
   end
 
   @impl true
-  def terminate?([best | _], generation, temperature) do
+  def terminate?([best | _], _generation, _temperature) do
     #temperature < 1
     best.fitness == 1
   end
 end
 
-soln = Genetic.run(Speller, selection_type: &Toolbox.Selection.elite/2, crossover_type: &Toolbox.Crossover.single_point/2)
+soln = Genetic.run(Speller,
+  selection_type: &Toolbox.Selection.roulette(&1, &2),
+  crossover_type: &Toolbox.Crossover.uniform(&1, &2, 0.5),
+  reinsertion_strategy: &Toolbox.Reinsertion.uniform(&1, &2, &3, 0.1),
+  selection_rate: 0.75,
+  mutation_rate: 0.1
+)
 
 IO.write("\n")
 IO.inspect(soln)

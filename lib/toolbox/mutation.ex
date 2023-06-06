@@ -1,11 +1,10 @@
 defmodule Toolbox.Mutation do
   alias Types.Chromosome
-  use Bitwise
+  import Bitwise
 
   # Defines mutation strategies
   # Mutations may change the length of chromosome.genes
   # Mutations must not change the value of chromosome.size to match (chromosome repair expects the original value)
-
 
   # Flip a certain percentage of genes from 1 to 0, and vice versa
   # Only works on binary genotype
@@ -14,6 +13,7 @@ defmodule Toolbox.Mutation do
       chromosome.genes
       |> Enum.map(fn g ->
         if :rand.uniform() < p do
+          #bxor(g, 1) ?
           g ^^^ 1
         else
           g
@@ -55,11 +55,12 @@ defmodule Toolbox.Mutation do
   # Tends to mutate a gene slowly, keeping close to original value
   # Works for real-valued genes
   def gaussian(chromosome) do
-    mu = chromosome|>mu
+    mu = chromosome |> mu
+
     genes =
       chromosome.genes
       |> Enum.map(fn _ ->
-        :rand.normal(mu, chromosome|>sigma(mu))
+        :rand.normal(mu, chromosome |> sigma(mu))
       end)
 
     %Chromosome{chromosome | genes: genes}
@@ -70,10 +71,10 @@ defmodule Toolbox.Mutation do
   end
 
   def sigma(chromosome, mu) do
-      chromosome.genes
-      |> Enum.map(fn x -> (mu - x) * (mu - x) end)
-      |> Enum.sum()
-      |> Kernel./(chromosome.size)
+    chromosome.genes
+    |> Enum.map(fn x -> (mu - x) * (mu - x) end)
+    |> Enum.sum()
+    |> Kernel./(chromosome.size)
   end
 
   # todo p.122 further ideas

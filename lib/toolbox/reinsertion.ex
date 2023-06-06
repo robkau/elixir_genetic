@@ -12,20 +12,22 @@ defmodule Toolbox.Reinsertion do
   # Todo will this grow the population?
   def elitist(parents, offspring, leftovers, survival_rate) do
     old = parents ++ leftovers
-   n = floor(length(old) * survival_rate)
+    n = floor(length(old) * survival_rate)
+
     survivors =
       old
       |> Enum.sort_by(& &1.fitness, &>=/2)
       |> Enum.take(n)
+
     offspring ++ survivors
   end
-
 
   # Uniform reinsertion: retain a random selection of parents for next generation
   # Todo will this grow the population?
   def uniform(parents, offspring, leftovers, survival_rate) do
     old = parents ++ leftovers
     n = floor(length(old) * survival_rate)
+
     survivors =
       old
       |> Enum.take_random(n)

@@ -4,16 +4,17 @@ defmodule Genetic do
   # Create population of initial chromosomes
   def initialize(genotype, opts \\ []) do
     population_size = Keyword.get(opts, :population_size, 100)
-    for _ <- 1..population_size, do: genotype.()
+    population = for _ <- 1..population_size, do: genotype.()
+    Utilities.Genealogy.add_chromosomes(population)
+    population
   end
 
   # Sort by most fit
-  def evaluate(population, fitness_function, opts \\ []) do
+  def evaluate(population, fitness_function, _opts \\ []) do
     population
     |> Enum.map(fn chromosome ->
       fitness = fitness_function.(chromosome)
-      age = chromosome.age + 1
-      %Chromosome{chromosome | fitness: fitness, age: age}
+      %Chromosome{chromosome | fitness: fitness, age: chromosome.age + 1}
     end)
     |> Enum.sort_by(fn chromosome -> chromosome.fitness end, &>=/2)
   end
@@ -28,6 +29,9 @@ defmodule Genetic do
     parents =
       select_fn
       |> apply([population, n])
+
+    #IO.write("\nrequested #{n} and out #{length(parents)}\n")
+
 
     leftover =
       population
@@ -50,8 +54,9 @@ defmodule Genetic do
       [],
       fn {p1, p2}, acc ->
         {c1, c2} = apply(crossover_fn, [p1, p2])
-        [c1, c2 | acc]
-        # todo? [c1 | [c2 | acc]]
+        Utilities.Genealogy.add_chromosome(p1, p2, c1)
+        Utilities.Genealogy.add_chromosome(p1, p2, c2)
+        [c1 | [c2 | acc]]
       end
     )
 
@@ -85,7 +90,13 @@ defmodule Genetic do
 
     population
     |> Enum.take_random(n)
-    |> Enum.map(& apply(mutate_fn, [&1]))
+    |> Enum.map(
+         fn c ->
+           mutant = apply(mutate_fn, [c])
+           Utilities.Genealogy.add_chromosome(c, mutant)
+           mutant
+         end
+       )
   end
 
   def reinsertion(parents, offspring, leftover, opts \\ []) do
@@ -102,11 +113,14 @@ defmodule Genetic do
 
   def evolve(population, problem, generation, last_max_fitness, temperature, opts \\ []) do
     population = evaluate(population, &problem.fitness_function/1, opts)
+    statistics(population, generation, opts)
     best = hd(population)
     best_fitness = best.fitness
 
     temperature = 0.999 * (temperature + (best_fitness - last_max_fitness))
-    IO.write("\rCurrent Best: #{inspect(best)}")
+
+    {_, current_generation_statistics} = Utilities.Statistics.lookup(generation)
+    IO.write("\rPopulation: #{current_generation_statistics.population_size}} Current Best: #{inspect(best)}")
 
     if problem.terminate?(population, generation, temperature) do
       IO.write("\n\nTerminated run.\n\n")
@@ -119,14 +133,37 @@ defmodule Genetic do
       offspring = children ++ mutants
 
       # de-chunk the parent pairs
-      parents = parents
-                  |> Enum.reduce([],
-                       fn {p1, p2}, acc ->
-                         [p1, p2 | acc]
-                       end)
+      parents =
+        parents
+        |> Enum.reduce(
+          [],
+          fn {p1, p2}, acc ->
+            [p1, p2 | acc]
+          end
+        )
 
       new_population = reinsertion(parents, offspring, leftover, opts)
-      evolve(new_population, problem, generation+1, best_fitness, temperature, opts)
+      evolve(new_population, problem, generation + 1, best_fitness, temperature, opts)
     end
+  end
+
+  def statistics(population, generation, opts \\ []) do
+    default_stats = [
+      min_fitness: &Enum.min_by(&1, fn c -> c.fitness end).fitness,
+      max_fitness: &Enum.max_by(&1, fn c -> c.fitness end).fitness,
+      mean_fitness: &Enum.sum(Enum.map(&1, fn c -> c.fitness end)) / length(population),
+      population_size: fn _p -> length(population) end,
+    ]
+    extra_stats = Keyword.get(opts, :statistics, [])
+
+    stats_map =
+      default_stats
+      |> Keyword.merge(extra_stats)
+      |> Enum.reduce(%{},
+           fn {key, func}, acc ->
+             Map.put(acc, key, func.(population))
+           end
+         )
+    Utilities.Statistics.insert(generation, stats_map)
   end
 end
