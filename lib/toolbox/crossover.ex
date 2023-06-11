@@ -8,7 +8,8 @@ defmodule Toolbox.Crossover do
     {{h1, t1}, {h2, t2}} = {Enum.split(p1.genes, cut_point), Enum.split(p2.genes, cut_point)}
     c1 = h1 ++ t2
     c2 = h2 ++ t1
-    {%Chromosome{p1 | genes: c1, size: length(c1)}, %Chromosome{p2 | genes: c2, size: length(c2)}}
+    {Chromosome.new(c1, p1.fitness, p1.age),
+    Chromosome.new(c2, p2.fitness, p2.age)}
   end
 
   def single_point_multi_parents([]) do
@@ -29,7 +30,7 @@ defmodule Toolbox.Crossover do
         {front, _} = Enum.split(p1.genes, crossover_point)
         {_, back} = Enum.split(p2.genes, crossover_point)
         c = front ++ back
-        p = %Chromosome{p1 | genes: c, size: length(c)}
+        p = Chromosome.new(c, p1.fitness, p1.age)
         [p | chd]
       end
     )
@@ -51,7 +52,8 @@ defmodule Toolbox.Crossover do
       end)
       |> Enum.unzip()
 
-    {%Chromosome{p1 | genes: c1, size: length(c1)}, %Chromosome{p2 | genes: c2, size: length(c2)}}
+    {Chromosome.new(c1, p1.fitness, p1.age),
+      Chromosome.new(c2, p2.fitness, p2.age)}
   end
 
   # Davis order crossover
@@ -83,7 +85,8 @@ defmodule Toolbox.Crossover do
     # make and return
     {c1, c2} = {head1 ++ slice1 ++ tail1, head2 ++ slice2 ++ tail2}
 
-    {%Chromosome{p1 | genes: c1, size: length(c1)}, %Chromosome{p2 | genes: c2, size: length(c2)}}
+    {Chromosome.new(c1, p1.fitness, p1.age),
+      Chromosome.new(c2, p2.fitness, p2.age)}
   end
 
   # Strategy for real-valued chromosomes
@@ -101,6 +104,7 @@ defmodule Toolbox.Crossover do
       end)
       |> Enum.unzip()
 
-    {%Chromosome{p1 | genes: c1, size: length(c1)}, %Chromosome{p2 | genes: c2, size: length(c2)}}
+    {Chromosome.new(c1, p1.fitness, p1.age),
+      Chromosome.new(c2, p2.fitness, p2.age)}
   end
 end

@@ -20,7 +20,7 @@ defmodule Toolbox.Mutation do
         end
       end)
 
-    %Chromosome{chromosome | genes: genes}
+    Chromosome.new(genes, chromosome.fitness, chromosome.age)
   end
 
   # Scramble all genes
@@ -29,7 +29,7 @@ defmodule Toolbox.Mutation do
       chromosome.genes
       |> Enum.shuffle()
 
-    %Chromosome{chromosome | genes: genes}
+    Chromosome.new(genes, chromosome.fitness, chromosome.age)
   end
 
   # Scramble genes in a random slice of length n
@@ -47,7 +47,8 @@ defmodule Toolbox.Mutation do
     mid = Enum.slice(chromosome.genes, lo, hi)
     tail = Enum.slice(chromosome.genes, hi, chromosome.size)
 
-    %Chromosome{chromosome | genes: head ++ Enum.shuffle(mid) ++ tail}
+    genes = head ++ Enum.shuffle(mid) ++ tail
+    Chromosome.new(genes, chromosome.fitness, chromosome.age)
   end
 
   # Scramble genes by gaussian random number distribution
@@ -63,7 +64,7 @@ defmodule Toolbox.Mutation do
         :rand.normal(mu, chromosome |> sigma(mu))
       end)
 
-    %Chromosome{chromosome | genes: genes}
+    Chromosome.new(genes, chromosome.fitness, chromosome.age)
   end
 
   def mu(chromosome) do

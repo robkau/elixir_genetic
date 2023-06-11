@@ -13,7 +13,7 @@ defmodule Schedule do
   def genotype do
     # genes are binary - each slot is 1 or 0 for taking the class or not.
     genes = for _ <- 1..10, do: Enum.random(0..1)
-    %Chromosome{genes: genes, size: 10}
+    Chromosome.new(genes)
   end
 
   @impl true

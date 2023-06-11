@@ -9,7 +9,7 @@ defmodule Cargo do
   @impl true
   def genotype do
     genes = for _ <- 1..10, do: Enum.random(0..1)
-    %Chromosome{genes: genes, size: 10}
+    Chromosome.new(genes)
   end
 
   @impl true

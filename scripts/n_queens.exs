@@ -5,7 +5,7 @@ defmodule NQueens do
   @impl true
   def genotype do
     genes = Enum.shuffle(0..7)
-    %Chromosome{genes: genes, size: 8}
+    Chromosome.new(genes)
   end
 
   @impl true

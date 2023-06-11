@@ -30,9 +30,6 @@ defmodule Genetic do
       select_fn
       |> apply([population, n])
 
-    #IO.write("\nrequested #{n} and out #{length(parents)}\n")
-
-
     leftover =
       population
       |> MapSet.new()

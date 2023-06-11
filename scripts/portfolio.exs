@@ -8,7 +8,7 @@ defmodule Portfolio do
   def genotype do
     genes = for _ <- 1..10, do: {:rand.uniform(10), :rand.uniform(10)}
     # genes are a tuple of {roi, risk}
-    %Chromosome{genes: genes, size: 10}
+    Chromosome.new(genes)
   end
 
   @impl true

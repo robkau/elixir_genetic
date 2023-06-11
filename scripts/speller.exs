@@ -9,7 +9,7 @@ defmodule Speller do
     genes =
       Stream.repeatedly(fn -> Enum.random(?a..?z) end)
       |> Enum.take(String.length(@target_word))
-    %Chromosome{genes: genes, size: String.length(@target_word)}
+    Chromosome.new(genes)
   end
 
   @impl true

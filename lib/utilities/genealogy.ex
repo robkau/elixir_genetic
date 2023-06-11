@@ -34,6 +34,7 @@ defmodule Utilities.Genealogy do
     new_genealogy =
       genealogy
       |> Graph.add_edge(parent, child)
+
     {:noreply, new_genealogy}
   end
 
@@ -43,6 +44,7 @@ defmodule Utilities.Genealogy do
       genealogy
       |> Graph.add_edge(parent_a, child)
       |> Graph.add_edge(parent_b, child)
+
     {:noreply, new_genealogy}
   end
 
