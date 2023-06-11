@@ -20,6 +20,7 @@ defmodule Genetic.MixProject do
 
   defp deps do
     [
+      {:alex, "~> 0.3.2"},
       {:gnuplot, "~> 1.19"},
       {:libgraph, "~> 0.13"}
     ]
