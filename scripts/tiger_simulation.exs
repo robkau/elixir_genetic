@@ -2,7 +2,7 @@ defmodule TigerSimulation do
   @behaviour Problem
   alias Types.Chromosome
 
-  @num_generations 3
+  @num_generations 150
 
   # todo dot graph does not look like the book, generation 0 does not connect to generation 1.
 
@@ -46,7 +46,7 @@ end
 
 tiger =
   Genetic.run(TigerSimulation,
-    population_size: 2,
+    population_size: 100,
     selection_rate: 0.9,
     mutation_rate: 0.1,
     statistics: [average_tiger: &TigerSimulation.average_tiger/1]
@@ -55,19 +55,20 @@ tiger =
 IO.write("\n")
 IO.inspect(tiger)
 
-{_, zero_gen_stats} = Utilities.Statistics.lookup(0)
-#{_, fivehundred_gen_stats} = Utilities.Statistics.lookup(500)
-#{_, onethousand_gen_stats} = Utilities.Statistics.lookup(1000)
+stats = :ets.tab2list(:statistics)
+  |> Enum.map(fn {gen, stats} -> [gen, stats.mean_fitness] end)
+{:ok, cmd} =
+  Gnuplot.plot([
+  [:set, :title, "mean fitness versus generation"],
+  [:plot, "-", :with, :points]
+  ], [stats])
 
-IO.inspect(zero_gen_stats)
-#IO.inspect(fivehundred_gen_stats)
-#IO.inspect(onethousand_gen_stats)
-
-genealogy = Utilities.Genealogy.get_tree()
-
-{:ok, dot} = Graph.Serializers.DOT.serialize(genealogy)
-{:ok, dotfile} = File.open('tiger_simulation.dot', [:write])
-:ok = IO.binwrite(dotfile, dot)
-:ok = File.close(dotfile)
+#{_, zero_gen_stats} = Utilities.Statistics.lookup(0)
+#IO.inspect(zero_gen_stats)
+#genealogy = Utilities.Genealogy.get_tree()
+#{:ok, dot} = Graph.Serializers.DOT.serialize(genealogy)
+#{:ok, dotfile} = File.open('tiger_simulation.dot', [:write])
+#:ok = IO.binwrite(dotfile, dot)
+#:ok = File.close(dotfile)
 
 #IO.inspect(Graph.vertices(genealogy))
