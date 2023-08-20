@@ -4,8 +4,7 @@ defmodule DummyProblem do
 
   @impl true
   def genotype do
-    genes =
-      for _ <- 1..100, do: Enum.random(0..1)
+    genes = for _ <- 1..100, do: Enum.random(0..1)
     Chromosome.new(genes)
   end
 
@@ -20,7 +19,6 @@ defmodule DummyProblem do
   end
 end
 
-
 defmodule Profiler do
   import ExProf.Macro
 
@@ -33,7 +31,7 @@ defmodule Profiler do
   def run do
     {records, _block_result} = do_analyze
     total_percent = Enum.reduce(records, 0.0, &(&1.percent + &2))
-    IO.inspect "total = #{total_percent}"
+    IO.inspect("total = #{total_percent}")
   end
 end
 
