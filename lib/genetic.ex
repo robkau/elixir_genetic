@@ -21,7 +21,7 @@ defmodule Genetic do
   # Sort by most fit
   def evaluate(population, fitness_function, _opts \\ []) do
     population
-    |> Enum.map(fn chromosome ->
+    |> pmap(fn chromosome ->
       fitness = fitness_function.(chromosome)
       %Chromosome{chromosome | fitness: fitness, age: chromosome.age + 1}
     end)
@@ -47,7 +47,7 @@ defmodule Genetic do
     parents =
       parents
       |> Enum.chunk_every(2)
-      |> Enum.map(&List.to_tuple(&1))
+      |> pmap(&List.to_tuple(&1))
 
     {parents, MapSet.to_list(leftover)}
   end
@@ -66,7 +66,17 @@ defmodule Genetic do
       end
     )
 
-    # |> Enum.map(& repair_chromosome(&1))
+    #    population
+    #    |> pmap(
+    #      fn {p1, p2} ->
+    #        {c1, c2} = apply(crossover_fn, [p1, p2])
+    #        Utilities.Genealogy.add_chromosome(p1, p2, c1)
+    #        Utilities.Genealogy.add_chromosome(p1, p2, c2)
+    #        {c1, c2}
+    #      end
+    #    )
+
+    # |> pmap(& repair_chromosome(&1))
   end
 
   def repair_chromosome(chromosome) do
@@ -89,20 +99,18 @@ defmodule Genetic do
   end
 
   def mutation(population, opts \\ []) do
-    mutate_fn = Keyword.get(opts, :mutation_type, &Toolbox.Mutation.scramble/1)
+    mutate_fn = Keyword.get(opts, :mutation_type, &Toolbox.Mutation.shuffle/1)
     rate = Keyword.get(opts, :mutation_rate, 0.05)
 
     n = floor(length(population) * rate)
 
     population
     |> Enum.take_random(n)
-    |> Enum.map(
-         fn c ->
-           mutant = apply(mutate_fn, [c])
-           Utilities.Genealogy.add_chromosome(c, mutant)
-           mutant
-         end
-       )
+    |> pmap(fn c ->
+      mutant = apply(mutate_fn, [c])
+      Utilities.Genealogy.add_chromosome(c, mutant)
+      mutant
+    end)
   end
 
   def reinsertion(parents, offspring, leftover, opts \\ []) do
@@ -125,8 +133,13 @@ defmodule Genetic do
 
     temperature = 0.999 * (temperature + (best_fitness - last_max_fitness))
 
-    {_, current_generation_statistics} = Utilities.Statistics.lookup(generation)
-    IO.write("\rPopulation: #{current_generation_statistics.population_size}} Current Best: #{inspect(best)}")
+    if generation |> rem(100) == 0 do
+      {_, current_generation_statistics} = Utilities.Statistics.lookup(generation)
+
+      IO.write(
+        "\r\nGeneration: #{generation}\nPopulation: #{current_generation_statistics.population_size}\nCurrent best genes: #{inspect(best.genes)}\nCurrent best score: :#{best_fitness}\n"
+      )
+    end
 
     if problem.terminate?(population, generation, temperature) do
       IO.write("\n\nTerminated run.\n\n")
@@ -157,19 +170,30 @@ defmodule Genetic do
     default_stats = [
       min_fitness: &Enum.min_by(&1, fn c -> c.fitness end).fitness,
       max_fitness: &Enum.max_by(&1, fn c -> c.fitness end).fitness,
-      mean_fitness: &Enum.sum(Enum.map(&1, fn c -> c.fitness end)) / length(population),
-      population_size: fn _p -> length(population) end,
+      mean_fitness: &(Enum.sum(Enum.map(&1, fn c -> c.fitness end)) / length(population)),
+      population_size: fn _p -> length(population) end
     ]
+
     extra_stats = Keyword.get(opts, :statistics, [])
 
     stats_map =
       default_stats
       |> Keyword.merge(extra_stats)
-      |> Enum.reduce(%{},
-           fn {key, func}, acc ->
-             Map.put(acc, key, func.(population))
-           end
-         )
+      |> Enum.reduce(
+        %{},
+        fn {key, func}, acc ->
+          Map.put(acc, key, func.(population))
+        end
+      )
+
     Utilities.Statistics.insert(generation, stats_map)
+  end
+
+  # Parallel helper
+  # todo can look at replacing other Enum.map calls
+  def pmap(collection, func) do
+    collection
+    |> Enum.map(&Task.async(fn -> func.(&1) end))
+    |> Enum.map(&Task.await(&1))
   end
 end

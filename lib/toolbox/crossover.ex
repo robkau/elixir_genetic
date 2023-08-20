@@ -3,6 +3,12 @@ defmodule Toolbox.Crossover do
 
   # Randomly selects a split point and then cuts/rejoins the chromosomes at that point
   # No regard for validity of new chromosome
+  def single_point(p1, p2)
+      when length(p1.genes) < 1
+      when length(p2.genes) < 1 do
+    {Chromosome.new(p1.genes, p1.fitness, p1.age),
+      Chromosome.new(p2.genes, p2.fitness, p2.age)}
+  end
   def single_point(p1, p2) do
     cut_point = :rand.uniform(length(p1.genes))
     {{h1, t1}, {h2, t2}} = {Enum.split(p1.genes, cut_point), Enum.split(p2.genes, cut_point)}
@@ -39,6 +45,7 @@ defmodule Toolbox.Crossover do
   # Randomly swaps matching pairs of genes between parents
   # May be good strategy for binary genotypes
   # May be slow for large chromosomes
+  def uniform(p1, p2) do uniform(p1, p2, 0.5) end
   def uniform(p1, p2, rate) do
     {c1, c2} =
       p1.genes
@@ -61,9 +68,18 @@ defmodule Toolbox.Crossover do
   # May be used for permutations or ordered lists
   # Tries to preserve integrity of the permutation (avoid duplicate/missing elements after crossover)
   # May be slow for large chromosomes
+  @spec order_one(Chromosome.t, Chromosome.t) :: {Chromosome.t, Chromosome.t} # todo once or twice for multiple definitions in a row?
+  def order_one(p1, p2)
+      when length(p1.genes) < 1
+      when length(p2.genes) < 1 do
+    {Chromosome.new(p1.genes, p1.fitness, p1.age),
+      Chromosome.new(p2.genes, p2.fitness, p2.age)}
+  end
+  @spec order_one(Chromosome.t, Chromosome.t) :: {Chromosome.t, Chromosome.t}
   def order_one(p1, p2) do
-    lim = Enum.count(p1.genes) - 1
+    # todo only works if each element is present exactly once per chromosome.
 
+    lim = Enum.count(p1.genes) - 1
     # Get random range
     {i1, i2} =
       [:rand.uniform(lim), :rand.uniform(lim)]
@@ -82,7 +98,15 @@ defmodule Toolbox.Crossover do
     p1_contrib = Enum.reject(p1.genes, &MapSet.member?(slice2_set, &1))
     {head2, tail2} = Enum.split(p1_contrib, i1)
 
-    # make and return
+    # Make and return
+    IO.write("\nlim:#{lim}")
+    IO.write("\nrange:#{inspect({i1, i2})}")
+    IO.write("\nc1 head1:#{inspect(head1)}")
+    IO.write("\nc1 slice1:#{inspect(slice1)}")
+    IO.write("\nc1 tail1:#{inspect(tail1)}")
+    IO.write("\nc2 head2:#{inspect(head2)}")
+    IO.write("\nc2 slice2:#{inspect(slice2)}")
+    IO.write("\nc2 tail2:#{inspect(tail2)}")
     {c1, c2} = {head1 ++ slice1 ++ tail1, head2 ++ slice2 ++ tail2}
 
     {Chromosome.new(c1, p1.fitness, p1.age),

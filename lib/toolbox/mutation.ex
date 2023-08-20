@@ -23,8 +23,8 @@ defmodule Toolbox.Mutation do
     Chromosome.new(genes, chromosome.fitness, chromosome.age)
   end
 
-  # Scramble all genes
-  def scramble(chromosome) do
+  # Shuffle all genes
+  def shuffle(chromosome) do
     genes =
       chromosome.genes
       |> Enum.shuffle()
@@ -32,36 +32,56 @@ defmodule Toolbox.Mutation do
     Chromosome.new(genes, chromosome.fitness, chromosome.age)
   end
 
-  # Scramble genes in a random slice of length n
-  def scramble(chromosome, n) do
+  # Shuffle genes in a random slice of length n
+  def shuffle(chromosome, n)
+    when length(chromosome.genes) < 2
+    when length(chromosome.genes) < n
+    when n < 2 do
+      Chromosome.new(chromosome.genes, chromosome.fitness, chromosome.age+1)
+  end
+  def shuffle(chromosome, n) do
     start = :rand.uniform(n - 1)
-
+    over = Kernel.min(0, start + n - chromosome.size)
     {lo, hi} =
-      if start + n >= chromosome.size do
-        {start - n, start}
-      else
+      if over < 1 do
         {start, start + n}
+      else
+        {start - over, start + n}
       end
 
     head = Enum.slice(chromosome.genes, 0, lo)
-    mid = Enum.slice(chromosome.genes, lo, hi)
+    mid = Enum.slice(chromosome.genes, lo, hi - lo)
     tail = Enum.slice(chromosome.genes, hi, chromosome.size)
+
 
     genes = head ++ Enum.shuffle(mid) ++ tail
     Chromosome.new(genes, chromosome.fitness, chromosome.age)
   end
 
-  # Scramble genes by gaussian random number distribution
+
+
+
+
+  # Increment/Decrement genes by gaussian random number distribution
   # (calculate mean and standard deviation and use that for all new random numbers)
   # Tends to mutate a gene slowly, keeping close to original value
   # Works for real-valued genes
-  def gaussian(chromosome) do
+  def gaussian(chromosome) do gaussian(chromosome, false) end
+  def gaussian(chromosome, truncate) when length(chromosome.genes) < 1 do Chromosome.new(chromosome.genes, chromosome.fitness, chromosome.age) end
+  def gaussian(chromosome, truncate) when not is_boolean(truncate) do raise "truncate must be a boolean" end
+  def gaussian(chromosome, truncate) do
     mu = chromosome |> mu
-
     genes =
       chromosome.genes
       |> Enum.map(fn _ ->
         :rand.normal(mu, chromosome |> sigma(mu))
+      end)
+      |> Enum.map(fn v ->
+        if !truncate do
+          v
+          else
+          floor(v)
+        end
       end)
 
     Chromosome.new(genes, chromosome.fitness, chromosome.age)
@@ -79,7 +99,6 @@ defmodule Toolbox.Mutation do
   end
 
   # todo p.122 further ideas
-  # - swap
   # - uniform
   # - invert
 end
