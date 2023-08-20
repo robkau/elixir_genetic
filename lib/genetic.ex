@@ -1,6 +1,15 @@
 defmodule Genetic do
   alias Types.Chromosome
 
+  # Not working on windows!
+  #@on_load :load_nif
+  #def load_nif do
+  #  :erlang.load_nif('./genetic', 0)
+  #end
+  #def xor96 do
+  #  raise "NIF xor96/0 not implemented."
+  #end
+
   # Create population of initial chromosomes
   def initialize(genotype, opts \\ []) do
     population_size = Keyword.get(opts, :population_size, 100)

@@ -8,7 +8,6 @@ Following the book [Genetic Algorithms in Elixir](https://pragprog.com/titles/sm
 Mix project:
 
 # Genetic
-**TODO: Add description**
 
 ## Installation
 
