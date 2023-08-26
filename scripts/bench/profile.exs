@@ -29,7 +29,7 @@ defmodule Profiler do
         selection_rate: 0.65,
         crossover_type: &Toolbox.Crossover.uniform(&1, &2),
         reinsertion_strategy: &Toolbox.Reinsertion.elitist(&1, &2, &3, 0.05),
-        mutation_type: &Toolbox.Mutation.gaussian(&1, true),
+        mutation_type: &Toolbox.Mutation.shuffle(&1),
         mutation_rate: 0.3
       )
 
