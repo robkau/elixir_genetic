@@ -10,7 +10,7 @@ defmodule Toolbox.Selection do
   # Ignores fitness, Maximizes genetic diversity
   def random(population, n) do
     population
-    |> Enum.take_random(n)
+    |> Genetic.Rng.take_random(n)
   end
 
   # Pair solutions in a sequence of N tournaments of size tournsize
@@ -21,7 +21,7 @@ defmodule Toolbox.Selection do
     0..(n - 1)
     |> Enum.map(fn _ ->
       population
-      |> Enum.take_random(tournsize)
+      |> Genetic.Rng.take_random(tournsize)
       |> Enum.max_by(& &1.fitness)
     end)
   end
@@ -37,7 +37,7 @@ defmodule Toolbox.Selection do
     else
       chosen =
         population
-        |> Enum.take_random(tournsize)
+        |> Genetic.Rng.take_random(tournsize)
         |> Enum.max_by(& &1.fitness)
 
       tournament_helper(population, n, tournsize, MapSet.put(selected, chosen))

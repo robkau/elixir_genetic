@@ -96,7 +96,7 @@ defmodule Genetic do
     n = floor(length(population) * rate)
 
     population
-    |> Enum.take_random(n)
+    |> Genetic.Rng.take_random(n)
     |> pmap(fn c ->
       mutant = apply(mutate_fn, [c])
       Utilities.Genealogy.add_chromosome(c, mutant)
@@ -128,7 +128,7 @@ defmodule Genetic do
       {_, current_generation_statistics} = Utilities.Statistics.lookup(generation)
 
       IO.write(
-        "\r\nGeneration: #{generation}\nPopulation: #{current_generation_statistics.population_size}\nCurrent best genes: #{inspect(best.genes)}\nCurrent best score: :#{best_fitness}\n"
+        "\r\nGeneration: #{generation}\nPopulation: #{current_generation_statistics.population_size}\nTemperature: #{temperature}\nCurrent best genes: #{inspect(best.genes)}\nCurrent best score: :#{best_fitness}\n"
       )
     end
 

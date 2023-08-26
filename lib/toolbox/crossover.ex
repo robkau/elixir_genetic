@@ -115,7 +115,7 @@ defmodule Toolbox.Crossover do
 
   # Strategy for real-valued chromosomes
   # Uses arithmetic to randomly set new value somewhere inbetween parent values
-  # No randomless involved so may converge too quickly (to fix: only combine a certain percent of genes)
+  # No randomness involved so may converge too quickly (to fix: only combine a certain percent of genes)
   def whole_arithmetic(p1, p2, alpha) do
     {c1, c2} =
       p1.genes

@@ -30,7 +30,7 @@ defmodule Toolbox.Reinsertion do
 
     survivors =
       old
-      |> Enum.take_random(n)
+      |> Genetic.Rng.take_random(n)
 
     offspring ++ survivors
   end

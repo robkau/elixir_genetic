@@ -25,21 +25,31 @@ defmodule Speller do
   end
 
   @impl true
-  def terminate?([best | _], _generation, _temperature) do
-    #temperature < 1
-    #best.fitness == 1
-    generation == 1000
+  def terminate?([best | _], generation, temperature) do
+    best.fitness == 1 || temperature < 20 || generation > 10000
   end
 end
 
+#Utilities.Benchmarker.run(Speller)
+#Utilities.Profiler.run(Speller)
+
+
 soln = Genetic.run(Speller,
-  selection_type: &Toolbox.Selection.tournament(&1, &2, 10),
-  selection_rate: 0.65,
-  #crossover_type: &Toolbox.Crossover.uniform(&1, &2),
-  reinsertion_strategy: &Toolbox.Reinsertion.elitist(&1, &2, &3, 0.05),
+  selection_type: &Toolbox.Selection.tournament(&1, &2, 3),
+  selection_rate: 0.62,
+  crossover_type: &Toolbox.Crossover.uniform(&1, &2),
+  reinsertion_strategy: &Toolbox.Reinsertion.uniform(&1, &2, &3, 0.15),
   mutation_type: &Toolbox.Mutation.gaussian(&1, true),
-  mutation_rate: 0.3
+  mutation_rate: 0.2
 )
 
 IO.write("\n")
 IO.inspect(soln)
+
+stats = :ets.tab2list(:statistics)
+        |> Enum.map(fn {gen, stats} -> [gen, stats.mean_fitness] end)
+{:ok, cmd} =
+  Gnuplot.plot([
+    [:set, :title, "mean fitness versus generation"],
+    [:plot, "-", :with, :points]
+  ], [stats])
