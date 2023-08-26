@@ -10,7 +10,7 @@ defmodule Toolbox.Crossover do
       Chromosome.new(p2.genes, p2.fitness, p2.age)}
   end
   def single_point(p1, p2) do
-    cut_point = :rand.uniform(length(p1.genes))
+    cut_point = Genetic.Rng.int_range(length(p1.genes))
     {{h1, t1}, {h2, t2}} = {Enum.split(p1.genes, cut_point), Enum.split(p2.genes, cut_point)}
     c1 = h1 ++ t2
     c2 = h2 ++ t1
@@ -25,7 +25,7 @@ defmodule Toolbox.Crossover do
   def single_point_multi_parents([p1 | []]), do: p1
 
   def single_point_multi_parents(parents) do
-    crossover_point = :rand.uniform(hd(parents).size)
+    crossover_point = Genetic.Rng.int_range(hd(parents).size)
 
     parents
     |> Enum.chunk_every(2, 1, [hd(parents)])
@@ -51,7 +51,7 @@ defmodule Toolbox.Crossover do
       p1.genes
       |> Enum.zip(p2.genes)
       |> Enum.map(fn {x, y} ->
-        if :rand.uniform() < rate do
+        if Genetic.Rng.float() < rate do
           {x, y}
         else
           {y, x}
@@ -82,7 +82,7 @@ defmodule Toolbox.Crossover do
     lim = Enum.count(p1.genes) - 1
     # Get random range
     {i1, i2} =
-      [:rand.uniform(lim), :rand.uniform(lim)]
+      [Genetic.Rng.int_range(lim), Genetic.Rng.int_range(lim)]
       |> Enum.sort()
       |> List.to_tuple()
 

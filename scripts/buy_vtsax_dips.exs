@@ -145,13 +145,13 @@ defmodule BuyVtsaxDips do
             # amount to buy if threshold is met
             i * 0.105 + 0.055,
             # threshold to buy on last price change
-            :rand.uniform(1000)
+            Genetic.Rng.int_range(1000)
           },
             {
               # amount to sell if threshold is met
               i * 0.105 + 0.055,
               # threshold to sell on last price change
-              :rand.uniform(1000)
+              Genetic.Rng.int_range(1000)
             }
           ]
 

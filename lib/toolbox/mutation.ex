@@ -12,7 +12,7 @@ defmodule Toolbox.Mutation do
     genes =
       chromosome.genes
       |> Enum.map(fn g ->
-        if :rand.uniform() < p do
+        if Genetic.Rng.float() < p do
           #bxor(g, 1) ?
           g ^^^ 1
         else
@@ -40,7 +40,7 @@ defmodule Toolbox.Mutation do
       Chromosome.new(chromosome.genes, chromosome.fitness, chromosome.age+1)
   end
   def shuffle(chromosome, n) do
-    start = :rand.uniform(n - 1)
+    start = Genetic.Rng.int_range(n - 1)
     over = Kernel.min(0, start + n - chromosome.size)
     {lo, hi} =
       if over < 1 do

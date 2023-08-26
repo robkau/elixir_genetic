@@ -4,7 +4,7 @@ defmodule Interactive do
 
   @impl true
   def genotype do
-    genes = for _ <- 1..10 do <<:rand.uniform(255)::utf8>> end
+    genes = for _ <- 1..10 do <<Genetic.Rng.int_range(255)::utf8>> end
     Chromosome.new(genes)
   end
 

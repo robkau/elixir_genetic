@@ -27,7 +27,8 @@ defmodule Speller do
   @impl true
   def terminate?([best | _], _generation, _temperature) do
     #temperature < 1
-    best.fitness == 1
+    #best.fitness == 1
+    generation == 1000
   end
 end
 

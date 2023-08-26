@@ -8,7 +8,6 @@ defmodule Genetic.MixProject do
       elixir: "~> 1.14",
       start_permanent: Mix.env() == :prod,
       deps: deps(),
-      # Not working in windows! compilers: [:genetic] ++ Mix.compilers,
     ]
   end
 
@@ -27,22 +26,8 @@ defmodule Genetic.MixProject do
       {:exprof, "~> 0.2.0"},
       {:gnuplot, "~> 1.19"},
       {:libgraph, "~> 0.13"},
-      {:stream_data, "~> 0.5", only: :test}
+      {:stream_data, "~> 0.5", only: :test},
+      {:rustler, "~> 0.27.0"}
     ]
   end
 end
-
-# Not working in windows!
-#defmodule Mix.Tasks.Compile.Genetic do
-#  use Mix.Task.Compiler
-#
-#  def run(_args) do
-#    {result, _errcode} =
-#      System.cmd(
-#      "mingw64/bin/gcc",
-#      ["-fpic", "-shared", "-Isrc", "-o", "genetic.so", "src/genetic.c"],
-#      stderr_to_stdout: true
-#      )
-#      IO.puts(result)
-#  end
-#end

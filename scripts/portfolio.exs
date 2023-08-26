@@ -6,7 +6,7 @@ defmodule Portfolio do
 
   @impl true
   def genotype do
-    genes = for _ <- 1..10, do: {:rand.uniform(10), :rand.uniform(10)}
+    genes = for _ <- 1..10, do: {Genetic.Rng.int_range(10), Genetic.Rng.int_range(10)}
     # genes are a tuple of {roi, risk}
     Chromosome.new(genes)
   end

@@ -56,7 +56,7 @@ defmodule Toolbox.Selection do
 
     0..(n - 1)
     |> Enum.map(fn _ ->
-      u = :rand.uniform() * sum_fitness
+      u = Genetic.Rng.float() * sum_fitness
 
       population
       |> Enum.reduce_while(
